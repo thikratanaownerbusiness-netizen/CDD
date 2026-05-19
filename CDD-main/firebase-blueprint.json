@@ -1,0 +1,84 @@
+{
+  "entities": {
+    "curriculums": {
+      "title": "Curriculum Framework",
+      "description": "Educational curriculum frameworks and documents.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "The title of the curriculum." },
+        "description": { "type": "string", "description": "A detailed description." },
+        "category": { "type": "string", "enum": ["University", "School", "Vocational", "Ministry", "Other"] },
+        "discipline": { "type": "string", "description": "Academic discipline (e.g., Science, Humanities)." },
+        "gradeLevel": { "type": "string", "description": "Target grade or program level." },
+        "fileUrl": { "type": "string", "format": "uri" },
+        "version": { "type": "string" },
+        "status": { "type": "string", "enum": ["Draft", "Published", "Archived"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "category", "status"]
+    },
+    "news": {
+      "title": "Department News",
+      "description": "Latest updates and announcements.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "imageUrl": { "type": "string", "format": "uri" },
+        "publishedAt": { "type": "string", "format": "date-time" },
+        "author": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["title", "content", "publishedAt"]
+    },
+    "events": {
+      "title": "Educational Events",
+      "description": "Conferences, workshops, and webinars.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "location": { "type": "string" },
+        "type": { "type": "string", "enum": ["Workshop", "Conference", "Webinar", "Policy Meeting"] },
+        "registrationUrl": { "type": "string", "format": "uri" }
+      },
+      "required": ["title", "date", "type"]
+    },
+    "resources": {
+      "title": "Teacher & Institution Resources",
+      "description": "Handbooks, templates, and guides.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "type": { "type": "string", "enum": ["Teaching Guide", "Lesson Plan", "Template", "Manual"] },
+        "fileUrl": { "type": "string", "format": "uri" },
+        "category": { "type": "string" }
+      },
+      "required": ["title", "type", "fileUrl"]
+    },
+    "inquiries": {
+      "title": "Institutional Inquiries",
+      "description": "Requests for consultation or partnerships.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "institution": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string", "enum": ["Consultation", "Partnership", "Curriculum Help", "Other"] },
+        "status": { "type": "string", "enum": ["New", "In Progress", "Handled"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "institution", "message", "type"]
+    }
+  },
+  "firestore": {
+    "/curriculums": { "schema": "curriculums", "description": "Collection of curriculum frameworks" },
+    "/news": { "schema": "news", "description": "Department news and announcements" },
+    "/events": { "schema": "events", "description": "Upcoming educational events" },
+    "/resources": { "schema": "resources", "description": "Downloadable academic resources" },
+    "/inquiries": { "schema": "inquiries", "description": "Contact and partnership requests" }
+  }
+}

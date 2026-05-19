@@ -1,0 +1,81 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() { return request.auth != null; }
+    function isAdmin() { return isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    function isValidCurriculum(data) {
+      return data.title is string && data.title.size() <= 200 &&
+             data.category in ["University", "School", "Vocational", "Ministry", "Other"] &&
+             data.status in ["Draft", "Published", "Archived"];
+    }
+
+    match /curriculums/{curriculumId} {
+      allow read: if existing().status == 'Published' || isAdmin();
+      allow create, update: if isAdmin() && isValidCurriculum(incoming()) && isValidId(curriculumId);
+      allow delete: if isAdmin();
+    }
+
+    function isValidNews(data) {
+      return data.title is string && data.title.size() <= 300 &&
+             data.content is string && data.content.size() <= 50000;
+    }
+
+    match /news/{newsId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidNews(incoming()) && isValidId(newsId);
+      allow delete: if isAdmin();
+    }
+
+    function isValidEvent(data) {
+      return data.title is string && data.title.size() <= 200 &&
+             data.type in ["Workshop", "Conference", "Webinar", "Policy Meeting"];
+    }
+
+    match /events/{eventId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidEvent(incoming()) && isValidId(eventId);
+      allow delete: if isAdmin();
+    }
+
+    function isValidResource(data) {
+      return data.title is string && data.title.size() <= 200 &&
+             data.type in ["Teaching Guide", "Lesson Plan", "Template", "Manual"];
+    }
+
+    match /resources/{resourceId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidResource(incoming()) && isValidId(resourceId);
+      allow delete: if isAdmin();
+    }
+
+    function isValidInquiry(data) {
+      return data.name is string && data.name.size() <= 100 &&
+             data.email is string && data.email.size() <= 100 &&
+             data.institution is string && data.institution.size() <= 200 &&
+             data.message is string && data.message.size() <= 2000 &&
+             data.type in ["Consultation", "Partnership", "Curriculum Help", "Other"];
+    }
+
+    match /inquiries/{inquiryId} {
+      allow read: if isAdmin();
+      allow create: if isValidInquiry(incoming());
+      allow update: if isAdmin() && (
+        incoming().diff(existing()).affectedKeys().hasOnly(['status'])
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /admins/{userId} {
+      allow read: if isSignedIn();
+      allow write: if false; // Only manageable via console or service account
+    }
+  }
+}

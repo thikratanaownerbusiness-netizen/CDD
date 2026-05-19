@@ -1,0 +1,6 @@
+{
+  "name": "Curriculum Development Department",
+  "description": "A premium, institution-grade platform for curriculum innovation, academic resources, and educational partnerships.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
